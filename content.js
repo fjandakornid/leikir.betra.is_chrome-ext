@@ -15,6 +15,7 @@ const showDiff = () => {
 
   $('tr:gt(1)').each(function () {
     const curr = $(this).find('td:eq(2)').text()
+    if (curr === '') return
     const diff = parseInt(last, 10) - parseInt(curr, 10)
     last = curr
     $(this).append('<td align=\'right\'>' + diff + '</td>')
@@ -26,6 +27,7 @@ const crawlTable = () => {
   let guesses = new Array(userCount)
   $('tr:gt(0)').each((i, tr) => {
     const rowUrl = $(tr).find('td:eq(2)').children('a').attr('href')
+    if (rowUrl === '' || rowUrl === undefined || rowUrl === null) return
 
     $.get(rowUrl, function (data) {
       // Get scores
