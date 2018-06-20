@@ -1,3 +1,5 @@
+/* global localStorage, location */
+
 const $ = window.$
 
 const userCount = $('tr:gt(0)').length
@@ -11,7 +13,7 @@ const showDiff = () => {
   let last = 0
   last = $('tr:eq(1)').find('td:eq(2)').text()
 
-  $('tr:gt(1)').each(function() {
+  $('tr:gt(1)').each(function () {
     const curr = $(this).find('td:eq(2)').text()
     const diff = parseInt(last, 10) - parseInt(curr, 10)
     last = curr
