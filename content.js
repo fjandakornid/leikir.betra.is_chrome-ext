@@ -6,8 +6,8 @@ const userCount = $('tr:gt(0)').length
 const mainTable = $('.webform')
 mainTable.css({ marginBottom: 20 })
 
-const showDiff = () => {
-  $('tr:first').append('<th>Diff</th>')
+const showDiffNext = () => {
+  $('tr:first').append('<th>ΔN</th>')
   $('tr:eq(1)').append('<td align=\'right\'>-</td>')
 
   let last = 0
@@ -18,6 +18,20 @@ const showDiff = () => {
     if (curr === '') return
     const diff = parseInt(last, 10) - parseInt(curr, 10)
     last = curr
+    $(this).append('<td align=\'right\'>' + diff + '</td>')
+  })
+}
+
+const showDiffTop = () => {
+  $('tr:first').append('<th>ΔT</th>')
+  $('tr:eq(1)').append('<td align=\'right\'>-</td>')
+
+  let top = $('tr:eq(1)').find('td:eq(2)').text()
+
+  $('tr:gt(1)').each(function () {
+    const curr = $(this).find('td:eq(2)').text()
+    if (curr === '') return
+    const diff = parseInt(top, 10) - parseInt(curr, 10)
     $(this).append('<td align=\'right\'>' + diff + '</td>')
   })
 }
@@ -75,7 +89,8 @@ const fetchBtn = $('<button>', { text: 'Uppfæra gögn' }).click(() => {
   })
 })
 mainTable.after(fetchBtn)
-showDiff()
+showDiffNext()
+showDiffTop()
 
 const scores = localStorage.getItem('scores')
 const guesses = localStorage.getItem('guesses')
