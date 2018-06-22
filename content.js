@@ -93,7 +93,9 @@ var getUrlParameter = function getUrlParameter (sParam) {
   }
 }
 
-const fetchBtn = $('<button>', { text: 'Uppfæra gögn' }).click(() => {
+const fetchBtn = $('<button>', { id: 'updatebtn', text: 'Uppfæra gögn' }).click(() => {
+  $('#updatebtn').prop('disabled', true)
+  $('#updatebtn').after('<span class="loader" />')
   const data = crawlTable()
   $(document).ajaxStop(function () {
     const league = getUrlParameter('l')
@@ -106,6 +108,9 @@ const fetchBtn = $('<button>', { text: 'Uppfæra gögn' }).click(() => {
 const init = () => {
   $('.webform').wrap('<div class="table-wrap"></div>')
   $('.table-wrap').wrap('<div id="table-scroll" class="table-scroll"></div>')
+  $('.table-scroll').css({ marginBottom: 20 })
+  $('.table-scroll').after(fetchBtn)
+  $(fetchBtn).css({ marginRight: 20 })
   showDiffToNext()
   showDiffToTop()
 
@@ -127,8 +132,6 @@ const init = () => {
   })
 
   $('.webform').clone(true).appendTo('#table-scroll').addClass('clone')
-  $('.table-scroll').css({ marginBottom: 20 })
-  $('.table-scroll').after(fetchBtn)
 }
 
 init()
