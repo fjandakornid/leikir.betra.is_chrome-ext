@@ -3,7 +3,7 @@
 
   "name": "Leikir.betra.is - viðbót",
   "description": "Bætir auka upplýsingum við einkadeild.",
-  "version": "1.0",
+  "version": "1.0.1",
 
   "permissions": ["storage"],
 
@@ -14,7 +14,8 @@
   },
 
    "content_scripts": [{
+    "matches": ["https://leikir.betra.is/league.php?l=*"],
     "js": ["jquery-3.3.1.min.js", "content.js"],
-    "matches": ["https://leikir.betra.is/league.php?l=*"]
+    "css": ["styles.css"]
   }]
 }

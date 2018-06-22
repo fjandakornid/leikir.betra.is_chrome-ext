@@ -1,0 +1,42 @@
+.table-scroll {
+	position:relative;
+	max-width:960px;
+	margin:auto;
+	overflow:hidden;
+}
+.table-wrap {
+	width:100%;
+	overflow:auto;
+}
+.table-scroll table {
+	width:100%;
+	margin:auto;
+	border-collapse:separate;
+	border-spacing:0;
+}
+.table-scroll th, .table-scroll td {
+	white-space:nowrap;
+	vertical-align:top;
+}
+
+.clone {
+	position:absolute;
+	top:0;
+	left:0;
+	pointer-events:none;
+}
+.clone th, .clone td {
+	visibility:hidden
+}
+.clone td, .clone th {
+	border-color:transparent
+}
+
+.clone .fixed {
+	visibility:visible;
+}
+.clone td {
+  background: #fff;
+}
+
+.clone thead, .clone tfoot{background:transparent;}

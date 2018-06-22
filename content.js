@@ -3,10 +3,8 @@
 const $ = window.$
 
 const userCount = $('tr:gt(0)').length
-const mainTable = $('.webform')
-mainTable.css({ marginBottom: 20 })
 
-const showDiffNext = () => {
+const showDiffToNext = () => {
   $('tr:first').append('<th>ΔN</th>')
   $('tr:eq(1)').append('<td align=\'right\'>-</td>')
 
@@ -22,7 +20,7 @@ const showDiffNext = () => {
   })
 }
 
-const showDiffTop = () => {
+const showDiffToTop = () => {
   $('tr:first').append('<th>ΔT</th>')
   $('tr:eq(1)').append('<td align=\'right\'>-</td>')
 
@@ -88,15 +86,31 @@ const fetchBtn = $('<button>', { text: 'Uppfæra gögn' }).click(() => {
     location.reload()
   })
 })
-mainTable.after(fetchBtn)
-showDiffNext()
-showDiffTop()
 
-const scores = localStorage.getItem('scores')
-const guesses = localStorage.getItem('guesses')
-if (guesses !== null) {
-  appendGuesses(JSON.parse(guesses))
+const init = () => {
+  $('.webform').wrap('<div class="table-wrap"></div>')
+  $('.table-wrap').wrap('<div id="table-scroll" class="table-scroll"></div>')
+  showDiffToNext()
+  showDiffToTop()
+
+  const scores = localStorage.getItem('scores')
+  const guesses = localStorage.getItem('guesses')
+  if (guesses !== null) {
+    appendGuesses(JSON.parse(guesses))
+  }
+  if (scores !== null) {
+    appendScores(JSON.parse(scores))
+  }
+
+  $('tr').each((i, tr) => {
+    for (let j = 0; j <= 6; j++) {
+      $(tr).find(`th:eq(${j}), td:eq(${j})`).addClass('fixed')
+    }
+  })
+
+  $('.webform').clone(true).appendTo('#table-scroll').addClass('clone')
+  $('.table-scroll').css({ marginBottom: 20 })
+  $('.table-scroll').after(fetchBtn)
 }
-if (scores !== null) {
-  appendScores(JSON.parse(scores))
-}
+
+init()
