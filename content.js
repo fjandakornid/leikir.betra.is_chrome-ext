@@ -78,11 +78,27 @@ const appendGuesses = (guesses) => {
   })
 }
 
+var getUrlParameter = function getUrlParameter (sParam) {
+  let sPageURL = decodeURIComponent(window.location.search.substring(1)),
+    sURLVariables = sPageURL.split('&'),
+    sParameterName,
+    i
+
+  for (i = 0; i < sURLVariables.length; i++) {
+    sParameterName = sURLVariables[i].split('=')
+
+    if (sParameterName[0] === sParam) {
+      return sParameterName[1] === undefined ? true : sParameterName[1]
+    }
+  }
+}
+
 const fetchBtn = $('<button>', { text: 'Uppfæra gögn' }).click(() => {
   const data = crawlTable()
   $(document).ajaxStop(function () {
-    localStorage.setItem('scores', JSON.stringify(data.matrix))
-    localStorage.setItem('guesses', JSON.stringify(data.guesses))
+    const league = getUrlParameter('l')
+    localStorage.setItem(league + '_scores', JSON.stringify(data.matrix))
+    localStorage.setItem(league + '_guesses', JSON.stringify(data.guesses))
     location.reload()
   })
 })
@@ -93,8 +109,10 @@ const init = () => {
   showDiffToNext()
   showDiffToTop()
 
-  const scores = localStorage.getItem('scores')
-  const guesses = localStorage.getItem('guesses')
+  const league = getUrlParameter('l')
+
+  const scores = localStorage.getItem(league + '_scores')
+  const guesses = localStorage.getItem(league + '_guesses')
   if (guesses !== null) {
     appendGuesses(JSON.parse(guesses))
   }
