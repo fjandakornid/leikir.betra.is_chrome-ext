@@ -35,8 +35,10 @@ const showDiffToTop = () => {
 }
 
 const crawlTable = () => {
+  let games = []
   let matrix = new Array(userCount)
   let guesses = new Array(userCount)
+  let nextGuesses = new Array(userCount)
   $('tr:gt(0)').each((i, tr) => {
     const rowUrl = $(tr).find('td:eq(2)').children('a').attr('href')
     if (rowUrl === '' || rowUrl === undefined || rowUrl === null) return
@@ -44,39 +46,80 @@ const crawlTable = () => {
     $.get(rowUrl, function (data) {
       // Get scores
       let userScores = []
+      let userGuesses = []
+      let nextUserGuesses = []
+      let team1, team2
       $(data).find('.webform tr').each((j, tr2) => {
         if ($(tr2).find('td').length === 7) {
-          const colText = $(tr2).find('td:eq(5)').text()
-          userScores.push(colText)
+          if (i === 0) {
+            team1 = $(tr2).find('td:eq(2)').text()
+            team2 = $(tr2).find('td:eq(4)').text()
+            finalScore = $(tr2).find('td:eq(6)').text()
+            games.push({'team1': team1, 'team2': team2, 'score': finalScore})
+          }
+          const score = $(tr2).find('td:eq(5)').text()
+          let guess = $(tr2).find('td:eq(3)').text()
+          if (score !== '') {
+            userScores.push(score)
+            userGuesses.push(guess)
+          } else {
+            nextUserGuesses.push(guess)
+          }
         }
       })
       matrix[i] = userScores
-
-      // Get guesses
-      guesses[i] = $(data).find('tr:last').find('td:eq(3)').text()
+      guesses[i] = userGuesses
+      if (nextUserGuesses.length > 0) {
+        nextGuesses[i] = nextUserGuesses
+      }
     })
   })
-  return {'matrix': matrix, 'guesses': guesses}
+  return {'games': games, 'matrix': matrix, 'guesses': guesses, 'nextguesses': nextGuesses}
 }
 
-const appendScores = (matrix) => {
-  for (let x = 1; x <= matrix[0].length; x++) {
-    $('tr:eq(0)').append('<th>' + x + '</th>')
+const appendData = (games, matrix, guesses, nextGuesses) => {
+  // Add header
+  for (let x = 0; x < games.length; x++) {
+    const game = games[x]
+    $('tr:eq(0)').append(`<th title="${game.team1}-${game.team2}: ${game.score}">${x+1}</th>`)
   }
+
+  // Add scores
   $('tr:gt(0)').each((i, tr) => {
     for (let j = 0; j < matrix[i].length; j++) {
       let value = matrix[i][j]
-      $(tr).append('<td align=\'center\' class=\'stig' + value + '\'>' + value + '</td>')
+      let guess = guesses[i][j]
+      $(tr).append(`<td align="center" class="stig${value}" title="${guess}">${value}</td>`)
+    }
+  })
+
+  // Add next-guesses
+  $('tr:gt(0)').each((i, tr) => {
+    for (let j = 0; j < nextguesses[i].length; j++) {
+      let value = nextguesses[i][j]
+      $(tr).append(`<td align="center">${value}</td>`)
     }
   })
 }
 
-const appendGuesses = (guesses) => {
-  $('tr:first').append('<th>Gisk</th>')
-  $('tr:gt(0)').each((i, tr) => {
-    $(tr).append('<td>' + guesses[i] + '</td>')
-  })
-}
+// const appendScores = (matrix) => {
+//   for (let x = 1; x <= matrix[0].length; x++) {
+//     $('tr:eq(0)').append('<th>' + x + '</th>')
+//   }
+//   $('tr:gt(0)').each((i, tr) => {
+//     for (let j = 0; j < matrix[i].length; j++) {
+//       let value = matrix[i][j]
+//       $(tr).append('<td align=\'center\' class=\'stig' + value + '\'>' + value + '</td>')
+//     }
+//   })
+// }
+
+// const appendGuesses = (guesses) => {
+//   $('tr:first').append('<th>Gisk</th>')
+//   $('tr:gt(0)').each((i, tr) => {
+//     $(tr).append('<td>' + guesses[i] + '</td>')
+//   })
+// }
 
 var getUrlParameter = function getUrlParameter (sParam) {
   let sPageURL = decodeURIComponent(window.location.search.substring(1)),
@@ -99,8 +142,10 @@ const fetchBtn = $('<button>', { id: 'updatebtn', text: 'Uppfæra gögn' }).clic
   const data = crawlTable()
   $(document).ajaxStop(function () {
     const league = getUrlParameter('l')
+    localStorage.setItem(league + '_games', JSON.stringify(data.games))
     localStorage.setItem(league + '_scores', JSON.stringify(data.matrix))
     localStorage.setItem(league + '_guesses', JSON.stringify(data.guesses))
+    localStorage.setItem(league + '_nextguesses', JSON.stringify(data.nextguesses))
     location.reload()
   })
 })
@@ -116,17 +161,18 @@ const init = () => {
 
   const league = getUrlParameter('l')
 
+  const games = localStorage.getItem(league + '_games')
   const scores = localStorage.getItem(league + '_scores')
   const guesses = localStorage.getItem(league + '_guesses')
-  if (guesses !== null) {
-    appendGuesses(JSON.parse(guesses))
-  }
-  if (scores !== null) {
-    appendScores(JSON.parse(scores))
+  const nextguesses = localStorage.getItem(league + '_nextguesses')
+
+  if (games !== null) {
+    appendData(JSON.parse(games), JSON.parse(scores), JSON.parse(guesses), JSON.parse(nextguesses))
   }
 
+  // Make table side-scrollable if two long
   $('tr').each((i, tr) => {
-    for (let j = 0; j <= 6; j++) {
+    for (let j = 0; j <= 5; j++) {
       $(tr).find(`th:eq(${j}), td:eq(${j})`).addClass('fixed')
     }
   })
