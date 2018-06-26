@@ -3,7 +3,7 @@
 
   "name": "Leikir.betra.is - viðbót",
   "description": "Bætir auka upplýsingum við einkadeild.",
-  "version": "1.0.3",
+  "version": "1.0.4",
 
   "permissions": ["storage"],
 

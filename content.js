@@ -51,19 +51,19 @@ const crawlTable = () => {
       let team1, team2
       $(data).find('.webform tr').each((j, tr2) => {
         if ($(tr2).find('td').length === 7) {
+          const finalScore = $(tr2).find('td:eq(6)').text()
           if (i === 0) {
             team1 = $(tr2).find('td:eq(2)').text()
             team2 = $(tr2).find('td:eq(4)').text()
-            finalScore = $(tr2).find('td:eq(6)').text()
             games.push({'team1': team1, 'team2': team2, 'score': finalScore})
           }
           const score = $(tr2).find('td:eq(5)').text()
-          let guess = $(tr2).find('td:eq(3)').text()
-          if (score !== '') {
+          const guess = $(tr2).find('td:eq(3)').text()
+          if (score.trim() === '' && finalScore.trim() === '') {
+            nextUserGuesses.push(guess)
+          } else {
             userScores.push(score)
             userGuesses.push(guess)
-          } else {
-            nextUserGuesses.push(guess)
           }
         }
       })
@@ -77,7 +77,7 @@ const crawlTable = () => {
   return {'games': games, 'matrix': matrix, 'guesses': guesses, 'nextguesses': nextGuesses}
 }
 
-const appendData = (games, matrix, guesses, nextGuesses) => {
+const appendData = (games, matrix, guesses, nextguesses) => {
   // Add header
   for (let x = 0; x < games.length; x++) {
     const game = games[x]
@@ -95,31 +95,13 @@ const appendData = (games, matrix, guesses, nextGuesses) => {
 
   // Add next-guesses
   $('tr:gt(0)').each((i, tr) => {
+    if (nextguesses[i] === null) return
     for (let j = 0; j < nextguesses[i].length; j++) {
       let value = nextguesses[i][j]
       $(tr).append(`<td align="center">${value}</td>`)
     }
   })
 }
-
-// const appendScores = (matrix) => {
-//   for (let x = 1; x <= matrix[0].length; x++) {
-//     $('tr:eq(0)').append('<th>' + x + '</th>')
-//   }
-//   $('tr:gt(0)').each((i, tr) => {
-//     for (let j = 0; j < matrix[i].length; j++) {
-//       let value = matrix[i][j]
-//       $(tr).append('<td align=\'center\' class=\'stig' + value + '\'>' + value + '</td>')
-//     }
-//   })
-// }
-
-// const appendGuesses = (guesses) => {
-//   $('tr:first').append('<th>Gisk</th>')
-//   $('tr:gt(0)').each((i, tr) => {
-//     $(tr).append('<td>' + guesses[i] + '</td>')
-//   })
-// }
 
 var getUrlParameter = function getUrlParameter (sParam) {
   let sPageURL = decodeURIComponent(window.location.search.substring(1)),
